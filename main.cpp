@@ -55,6 +55,22 @@ class Board {
     }
   }
 
+  bool isvalid() {
+    for (int i = 0; i < 9; i++) {
+      bool ish[10];
+      bool isv[10];
+      for (int j = 0; k < 10; k++) {
+        ish[j] = false;
+        isv[j] = false
+      }
+      for (int j = 0; j < 9; j++) {
+        if (ish[at(i, j)] || isv[at(i, j)]) return false;
+        ish[at(i, j)] = true;
+        isv[at(j, i)] = true;
+      }
+    }
+  }
+
  protected:
   std::array<std::array<int, 9>, 9> data;
 };
