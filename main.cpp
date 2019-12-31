@@ -7,10 +7,10 @@
 
 class Board {
  public:
-  Board(Board &b) {
+  Board(Board *b) {
     for (int i = 0; i < 9; i++) {
       for (int j = 0; j < 9; j++) {
-        at(i, j) = b.at(i, j);
+        at(i, j) = b->at(i, j);
       }
     }
   }
@@ -53,6 +53,11 @@ class Board {
       }
       if ((i + 1) % 3 == 0) std::cout << hline2;
     }
+    if (isvalid())
+      std::cout << "valid\n";
+    else
+      std::cout << "invalid\n";
+    usleep(1e6);
   }
 
   bool isvalid() {
@@ -88,6 +93,65 @@ class Board {
     return true;
   }
 
+  Board solve() {
+    print();
+    bool zerois = false;
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if (at(j, i) == 0) zerois = true;
+      }
+    }
+    if (isvalid() && zerois) {
+      int zeromin = 0;
+      int min = 9;
+      for (int i = 0; i < 27; i++) {
+        int count = 0;
+        for (int j = 0; j < 9; j++) {
+          if (atindex(i, j) == 0) count += 1;
+        }
+        if (count <= min) {
+          min = count;
+          zeromin = i;
+          std::cout << i;
+        }
+      }
+
+      bool num[9];
+      for (int i = 0; i < 9; i++) num[i] = false;
+      for (int i = 0; i < 9; i++) num[atindex(zeromin, i)] = true;
+      int minnum = 9;
+      for (int i = 0; i < 9; i++) {
+        if (!num[i]) {
+          minnum = i;
+          break;
+        }
+      }
+      for (int i = 0; i < 9; i++) {
+        if (atindex(zeromin, i) == 0) {
+          Board b(this);
+          b.atindex(zeromin, i) = minnum;
+          Board c = b.solve();
+          if (c.isvalid()) return c;
+        }
+      }
+    } else {
+      return this;
+    }
+  }
+  int &atindex(int i, int t) {
+    for (int i = 0; i < 27; i++) {
+      if (i < 9) {
+        return at(i, t);
+      } else if (i >= 9 && i < 18) {
+        return at(t, i % 9);
+      } else {
+        int x0 = ((i % 9) % 3) * 3;
+        int y0 = ((i % 9) / 3) * 3;
+        return at(x0 + t % 3, y0 + t / 3);
+      }
+    }
+  }
+
  protected:
   std::array<std::array<int, 9>, 9> data;
 };
@@ -98,13 +162,10 @@ int main() {
     std::string s;
     std::cin >> s;
     for (int j = 0; j < 9; j++) {
-      b.at(j, i) = s.at(j) - '0';
+      b.at(i, j) = s.at(j) - '0';
     }
   }
   b.print();
-  if (b.isvalid())
-    printf("valid.\n");
-  else
-    printf("invalid\n");
+  b.solve();
   return 0;
 }
