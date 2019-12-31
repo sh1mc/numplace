@@ -23,7 +23,7 @@ class Board {
   }
   int &at(int x, int y) {
     if (x >= 9 || x < 0 || y >= 9 || y < 0) {
-      printf("out of range\n");
+      printf("out of range%d, %d\n", x, y);
       exit(1);
     } else {
       return data.at(x).at(y);
@@ -59,16 +59,33 @@ class Board {
     for (int i = 0; i < 9; i++) {
       bool ish[10];
       bool isv[10];
-      for (int j = 0; k < 10; k++) {
+      for (int j = 0; j < 10; j++) {
         ish[j] = false;
-        isv[j] = false
+        isv[j] = false;
       }
       for (int j = 0; j < 9; j++) {
-        if (ish[at(i, j)] || isv[at(i, j)]) return false;
+        if ((at(i, j) != 0 && ish[at(i, j)]) ||
+            (at(j, i) != 0 && isv[at(j, i)]))
+          return false;
         ish[at(i, j)] = true;
         isv[at(j, i)] = true;
       }
     }
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        bool is[10];
+        for (int k = 0; k < 10; k++) is[k] = false;
+        int x0 = j * 3;
+        int y0 = i * 3;
+        for (int k = 0; k < 9; k++) {
+          int x = x0 + k % 3;
+          int y = y0 + k / 3;
+          if (at(x, y) != 0 && is[at(x, y)]) return false;
+          is[at(x, y)] = true;
+        }
+      }
+    }
+    return true;
   }
 
  protected:
@@ -78,11 +95,16 @@ class Board {
 int main() {
   Board b;
   for (int i = 0; i < 9; i++) {
+    std::string s;
+    std::cin >> s;
     for (int j = 0; j < 9; j++) {
-      b.at(i, j) = (i + j) % 9 + 1;
-      b.print();
-      usleep(1e6);
+      b.at(j, i) = s.at(j) - '0';
     }
   }
+  b.print();
+  if (b.isvalid())
+    printf("valid.\n");
+  else
+    printf("invalid\n");
   return 0;
 }
