@@ -38,10 +38,10 @@ class Board {
     for (int i = 0; i < 9; i++) {
       for (int j = 0; j < 9; j++) {
         char c;
-        if (at(i, j) == 0)
+        if (at(j, i) == 0)
           c = ' ';
         else
-          c = std::to_string(at(i, j)).at(0);
+          c = std::to_string(at(j, i)).at(0);
         if (j == 0)
           std::cout << lines[0] << c << lines[1];
         else if (j == 8)
@@ -112,10 +112,9 @@ class Board {
         if (count <= min) {
           min = count;
           zeromin = i;
-          std::cout << i;
         }
       }
-
+      std::cout << zeromin << "\n";
       bool num[9];
       for (int i = 0; i < 9; i++) num[i] = false;
       for (int i = 0; i < 9; i++) num[atindex(zeromin, i)] = true;
@@ -141,9 +140,9 @@ class Board {
   int &atindex(int i, int t) {
     for (int i = 0; i < 27; i++) {
       if (i < 9) {
-        return at(i, t);
+        return at(t, i);
       } else if (i >= 9 && i < 18) {
-        return at(t, i % 9);
+        return at(i % 9, t);
       } else {
         int x0 = ((i % 9) % 3) * 3;
         int y0 = ((i % 9) / 3) * 3;
@@ -162,7 +161,7 @@ int main() {
     std::string s;
     std::cin >> s;
     for (int j = 0; j < 9; j++) {
-      b.at(i, j) = s.at(j) - '0';
+      b.at(j, i) = s.at(j) - '0';
     }
   }
   b.print();
