@@ -57,7 +57,7 @@ class Board {
       std::cout << "valid\n";
     else
       std::cout << "invalid\n";
-    usleep(1e6);
+    // usleep(1e4);
   }
 
   bool isvalid() {
@@ -93,15 +93,14 @@ class Board {
     return true;
   }
 
+  bool isanswer() {
+    if (!zerois() && isvalid()) return true;
+    return false;
+  }
+
   Board solve() {
     print();
-    bool zerois = false;
-    for (int i = 0; i < 9; i++) {
-      for (int j = 0; j < 9; j++) {
-        if (at(j, i) == 0) zerois = true;
-      }
-    }
-    if (isvalid() && zerois) {
+    if (isvalid() && zerois()) {
       int zeromin = 0;
       int min = 9;
       for (int i = 0; i < 27; i++) {
@@ -109,7 +108,7 @@ class Board {
         for (int j = 0; j < 9; j++) {
           if (atindex(i, j) == 0) count += 1;
         }
-        if (count <= min) {
+        if (count < min && count != 0) {
           min = count;
           zeromin = i;
         }
@@ -130,7 +129,7 @@ class Board {
           Board b(this);
           b.atindex(zeromin, i) = minnum;
           Board c = b.solve();
-          if (c.isvalid()) return c;
+          if (c.isanswer()) return c;
         }
       }
     } else {
@@ -138,21 +137,29 @@ class Board {
     }
   }
   int &atindex(int i, int t) {
-    for (int i = 0; i < 27; i++) {
-      if (i < 9) {
-        return at(t, i);
-      } else if (i >= 9 && i < 18) {
-        return at(i % 9, t);
-      } else {
-        int x0 = ((i % 9) % 3) * 3;
-        int y0 = ((i % 9) / 3) * 3;
-        return at(x0 + t % 3, y0 + t / 3);
-      }
+    if (i < 9) {
+      return at(t, i);
+    } else if (i >= 9 && i < 18) {
+      return at(i % 9, t);
+    } else {
+      int x0 = ((i % 9) % 3) * 3;
+      int y0 = ((i % 9) / 3) * 3;
+      return at(x0 + t % 3, y0 + t / 3);
     }
   }
 
  protected:
   std::array<std::array<int, 9>, 9> data;
+
+ private:
+  bool zerois() {
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if (at(i, j) == 0) return true;
+      }
+    }
+    return false;
+  }
 };
 
 int main() {
